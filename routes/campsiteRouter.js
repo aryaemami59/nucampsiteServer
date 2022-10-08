@@ -9,6 +9,7 @@ campsiteRouter
   .route("/")
   .get((req, res, next) => {
     Campsite.find()
+      .populate("comments.author")
       .then(campsites => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
@@ -44,6 +45,7 @@ campsiteRouter
   .route(`/:${routerName}Id`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+      .populate("comments.author")
       .then(campsite => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
@@ -86,13 +88,14 @@ campsiteRouter
   .route(`/:${routerName}Id/comments`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+      .populate("comments.author")
       .then(campsite => {
         if (campsite) {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments);
         } else {
-          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
+          err = new Error(`Campsite ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         }
@@ -103,6 +106,7 @@ campsiteRouter
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
         if (campsite) {
+          req.body.author = req.user._id;
           campsite.comments.push(req.body);
           campsite
             .save()
@@ -154,6 +158,7 @@ campsiteRouter
   .route(`/:${routerName}Id/comments/:commentId`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+      .populate("comments.author")
       .then(campsite => {
         if (campsite && campsite.comments.id(req.params.commentId)) {
           res.statusCode = 200;
