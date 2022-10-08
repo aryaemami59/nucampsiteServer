@@ -1,54 +1,84 @@
+const routerName = "partner";
 const express = require("express");
 const partnerRouter = express.Router();
-const routerName = "partner";
+
+const Partner = require(`../models/${routerName}`);
 
 partnerRouter
   .route("/")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
+  .get((req, res, next) => {
+    Partner.find()
+      .then(partners => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partners);
+      })
+      .catch(err => next(err));
   })
-  .get((req, res) => {
-    res.end(`Will send all the ${routerName}s to you`);
-  })
-  .post((req, res) => {
-    res.end(
-      `Will add the ${routerName}: ${req.body.name} with description: ${req.body.description}`
-    );
+  .post((req, res, next) => {
+    Partner.create(req.body)
+      .then(partner => {
+        console.log(`${routerName} Created `, partner);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partner);
+      })
+      .catch(err => next(err));
   })
   .put((req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /${routerName}s`);
   })
-  .delete((req, res) => {
-    res.end(`Deleting all ${routerName}s`);
+  .delete((req, res, next) => {
+    Partner.deleteMany()
+      .then(response => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(response);
+      })
+      .catch(err => next(err));
   });
 
 partnerRouter
   .route(`/:${routerName}Id`)
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
-  })
-  .get((req, res) => {
-    res.end(
-      `Will send details of the ${routerName}: ${req.params.partnerId} to you`
-    );
+  .get((req, res, next) => {
+    Partner.findById(req.params.partnerId)
+      .then(partner => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partner);
+      })
+      .catch(err => next(err));
   })
   .post((req, res) => {
+    res.statusCode = 403;
     res.end(
       `POST operation not supported on /${routerName}s/${req.params.partnerId}`
     );
   })
-  .put((req, res) => {
-    res.end(
-      `Updating the ${routerName}: ${req.params.partnerId} \nWill replace with the ${routerName}: ${req.body.name} \n\twith description: ${req.body.description}`
-    );
+  .put((req, res, next) => {
+    Partner.findByIdAndUpdate(
+      req.params.partnerId,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
+      .then(partner => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partner);
+      })
+      .catch(err => next(err));
   })
-  .delete((req, res) => {
-    res.end(`Deleting ${routerName}: ${req.params.partnerId}`);
+  .delete((req, res, next) => {
+    Partner.findByIdAndDelete(req.params.partnerId)
+      .then(response => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(response);
+      })
+      .catch(err => next(err));
   });
 
 module.exports = partnerRouter;

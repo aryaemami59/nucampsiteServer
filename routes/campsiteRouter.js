@@ -1,5 +1,6 @@
 const express = require("express");
-const Campsite = require("../models/campsite");
+const routerName = "campsite";
+const Campsite = require(`../models/${routerName}`);
 
 const campsiteRouter = express.Router();
 
@@ -17,7 +18,7 @@ campsiteRouter
   .post((req, res, next) => {
     Campsite.create(req.body)
       .then(campsite => {
-        console.log("Campsite Created ", campsite);
+        console.log(`${routerName} Created `, campsite);
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json(campsite);
@@ -26,7 +27,7 @@ campsiteRouter
   })
   .put((req, res) => {
     res.statusCode = 403;
-    res.end("PUT operation not supported on /campsites");
+    res.end(`PUT operation not supported on /${routerName}s`);
   })
   .delete((req, res, next) => {
     Campsite.deleteMany()
@@ -39,7 +40,7 @@ campsiteRouter
   });
 
 campsiteRouter
-  .route("/:campsiteId")
+  .route(`/:${routerName}Id`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
@@ -52,7 +53,7 @@ campsiteRouter
   .post((req, res) => {
     res.statusCode = 403;
     res.end(
-      `POST operation not supported on /campsites/${req.params.campsiteId}`
+      `POST operation not supported on /${routerName}s/${req.params.campsiteId}`
     );
   })
   .put((req, res, next) => {
@@ -81,7 +82,7 @@ campsiteRouter
   });
 
 campsiteRouter
-  .route("/:campsiteId/comments")
+  .route(`/:${routerName}Id/comments`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
@@ -90,7 +91,7 @@ campsiteRouter
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments);
         } else {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         }
@@ -111,7 +112,7 @@ campsiteRouter
             })
             .catch(err => next(err));
         } else {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         }
@@ -121,7 +122,7 @@ campsiteRouter
   .put((req, res) => {
     res.statusCode = 403;
     res.end(
-      `PUT operation not supported on /campsites/${req.params.campsiteId}/comments`
+      `PUT operation not supported on /${routerName}s/${req.params.campsiteId}/comments`
     );
   })
   .delete((req, res, next) => {
@@ -140,7 +141,7 @@ campsiteRouter
             })
             .catch(err => next(err));
         } else {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         }
@@ -149,7 +150,7 @@ campsiteRouter
   });
 
 campsiteRouter
-  .route("/:campsiteId/comments/:commentId")
+  .route(`/:${routerName}Id/comments/:commentId`)
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
@@ -158,7 +159,7 @@ campsiteRouter
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments.id(req.params.commentId));
         } else if (!campsite) {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         } else {
@@ -172,7 +173,7 @@ campsiteRouter
   .post((req, res) => {
     res.statusCode = 403;
     res.end(
-      `POST operation not supported on /campsites/${req.params.campsiteId}/comments/${req.params.commentId}`
+      `POST operation not supported on /${routerName}s/${req.params.campsiteId}/comments/${req.params.commentId}`
     );
   })
   .put((req, res, next) => {
@@ -194,7 +195,7 @@ campsiteRouter
             })
             .catch(err => next(err));
         } else if (!campsite) {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         } else {
@@ -219,7 +220,7 @@ campsiteRouter
             })
             .catch(err => next(err));
         } else if (!campsite) {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
           err.status = 404;
           return next(err);
         } else {
@@ -230,7 +231,5 @@ campsiteRouter
       })
       .catch(err => next(err));
   });
-
-module.exports = campsiteRouter;
 
 module.exports = campsiteRouter;
