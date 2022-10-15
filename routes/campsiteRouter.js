@@ -102,11 +102,11 @@ campsiteRouter
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments);
-        } else {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
+          return;
         }
+        err = new Error(`Campsite ${req.params.campsiteId} not found`);
+        err.status = 404;
+        return next(err);
       })
       .catch(err => next(err));
   })
@@ -124,11 +124,11 @@ campsiteRouter
               res.json(campsite);
             })
             .catch(err => next(err));
-        } else {
-          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
+          return;
         }
+        err = new Error(`${routerName} ${req.params.campsiteId} not found`);
+        err.status = 404;
+        return next(err);
       })
       .catch(err => next(err));
   })
@@ -156,11 +156,11 @@ campsiteRouter
                 res.json(campsite);
               })
               .catch(err => next(err));
-          } else {
-            err = new Error(`${routerName} ${req.params.campsiteId} not found`);
-            err.status = 404;
-            return next(err);
+            return;
           }
+          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
+          err.status = 404;
+          return next(err);
         })
         .catch(err => next(err));
     }
@@ -172,19 +172,17 @@ campsiteRouter
     Campsite.findById(req.params.campsiteId)
       .populate("comments.author")
       .then(campsite => {
-        if (campsite && campsite.comments.id(req.params.commentId)) {
+        if (campsite?.comments.id(req.params.commentId)) {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments.id(req.params.commentId));
-        } else if (!campsite) {
-          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
-        } else {
-          err = new Error(`Comment ${req.params.commentId} not found`);
-          err.status = 404;
-          return next(err);
+          return;
         }
+        err = !campsite
+          ? new Error(`${routerName} ${req.params.campsiteId} not found`)
+          : new Error(`Comment ${req.params.commentId} not found`);
+        err.status = 404;
+        return next(err);
       })
       .catch(err => next(err));
   })
@@ -198,9 +196,9 @@ campsiteRouter
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
         if (
-          campsite &&
-          campsite.comments.id(req.params.commentId) &&
-          campsite.comments.id(req.params.commentId).author.equals(req.user._id)
+          campsite?.comments
+            .id(req.params.commentId)
+            ?.author.equals(req.user._id)
         ) {
           if (req.body.rating) {
             campsite.comments.id(req.params.commentId).rating = req.body.rating;
@@ -216,17 +214,19 @@ campsiteRouter
               res.json(campsite);
             })
             .catch(err => next(err));
-        } else if (!campsite) {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
-        } else if (!campsite.comments.id(req.params.commentId)) {
-          err = new Error(`Comment ${req.params.commentId} not found`);
-          err.status = 404;
-          return next(err);
         } else {
-          err = new Error("You are not authorized to perform this operation!");
-          err.status = 403;
+          if (!campsite) {
+            err = new Error(`Campsite ${req.params.campsiteId} not found`);
+            err.status = 404;
+          } else if (!campsite.comments.id(req.params.commentId)) {
+            err = new Error(`Comment ${req.params.commentId} not found`);
+            err.status = 404;
+          } else {
+            err = new Error(
+              "You are not authorized to perform this operation!"
+            );
+            err.status = 403;
+          }
           return next(err);
         }
       })
@@ -236,9 +236,9 @@ campsiteRouter
     Campsite.findById(req.params.campsiteId)
       .then(campsite => {
         if (
-          campsite &&
-          campsite.comments.id(req.params.commentId) &&
-          campsite.comments.id(req.params.commentId).author.equals(req.user._id)
+          campsite?.comments
+            .id(req.params.commentId)
+            ?.author.equals(req.user._id)
         ) {
           campsite.comments.id(req.params.commentId).remove();
           campsite
@@ -249,17 +249,19 @@ campsiteRouter
               res.json(campsite);
             })
             .catch(err => next(err));
-        } else if (!campsite) {
-          err = new Error(`${routerName} ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
-        } else if (!campsite.comments.id(req.params.commentId)) {
-          err = new Error(`Comment ${req.params.commentId} not found`);
-          err.status = 404;
-          return next(err);
         } else {
-          err = new Error("You are not authorized to perform this operation!");
-          err.status = 403;
+          if (!campsite) {
+            err = new Error(`${routerName} ${req.params.campsiteId} not found`);
+            err.status = 404;
+          } else if (!campsite.comments.id(req.params.commentId)) {
+            err = new Error(`Comment ${req.params.commentId} not found`);
+            err.status = 404;
+          } else {
+            err = new Error(
+              "You are not authorized to perform this operation!"
+            );
+            err.status = 403;
+          }
           return next(err);
         }
       })
