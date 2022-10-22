@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const { Schema, model, Types } = mongoose;
 require("mongoose-currency").loadType(mongoose);
-const { Currency } = mongoose.Types;
+const { Currency } = Types;
 
 const commentSchema = new Schema(
   {
@@ -16,7 +16,7 @@ const commentSchema = new Schema(
       required: true,
     },
     author: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
   },
@@ -60,6 +60,6 @@ const campsiteSchema = new Schema(
   }
 );
 
-const Campsite = mongoose.model("Campsite", campsiteSchema);
+const Campsite = model("Campsite", campsiteSchema);
 
 module.exports = Campsite;

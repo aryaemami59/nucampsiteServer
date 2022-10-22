@@ -2,14 +2,14 @@ const routerName = "partner";
 const express = require("express");
 const Partner = require(`../models/${routerName}`);
 const { verifyAdmin, verifyUser } = require("../authenticate");
-const cors = require("./cors");
+const { cors, corsWithOptions } = require("./cors");
 
 const partnerRouter = express.Router();
 
 partnerRouter
   .route("/")
-  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .get(cors.cors, (req, res, next) => {
+  .options(corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors, (req, res, next) => {
     Partner.find()
       .then(partners => {
         res.statusCode = 200;
@@ -18,26 +18,21 @@ partnerRouter
       })
       .catch(err => next(err));
   })
-  .post(
-    cors.corsWithOptions,
-    verifyUser,
-    verifyAdmin,
-    ({ body }, res, next) => {
-      Partner.create(body)
-        .then(partner => {
-          console.log(`${routerName} Created `, partner);
-          res.statusCode = 200;
-          res.setHeader("Content-Type", "application/json");
-          res.json(partner);
-        })
-        .catch(err => next(err));
-    }
-  )
-  .put(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
+  .post(corsWithOptions, verifyUser, verifyAdmin, ({ body }, res, next) => {
+    Partner.create(body)
+      .then(partner => {
+        console.log(`${routerName} Created `, partner);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partner);
+      })
+      .catch(err => next(err));
+  })
+  .put(corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /${routerName}s`);
   })
-  .delete(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res, next) => {
+  .delete(corsWithOptions, verifyUser, verifyAdmin, (req, res, next) => {
     Partner.deleteMany()
       .then(response => {
         res.statusCode = 200;
@@ -49,8 +44,8 @@ partnerRouter
 
 partnerRouter
   .route(`/:${routerName}Id`)
-  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .get(cors.cors, ({ params: { partnerId } }, res, next) => {
+  .options(corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors, ({ params: { partnerId } }, res, next) => {
     Partner.findById(partnerId)
       .then(partner => {
         res.statusCode = 200;
@@ -60,7 +55,7 @@ partnerRouter
       .catch(err => next(err));
   })
   .post(
-    cors.corsWithOptions,
+    corsWithOptions,
     verifyUser,
     verifyAdmin,
     ({ params: { partnerId } }, res) => {
@@ -69,7 +64,7 @@ partnerRouter
     }
   )
   .put(
-    cors.corsWithOptions,
+    corsWithOptions,
     verifyUser,
     verifyAdmin,
     ({ params: { partnerId }, body: $set }, res, next) => {
@@ -83,7 +78,7 @@ partnerRouter
     }
   )
   .delete(
-    cors.corsWithOptions,
+    corsWithOptions,
     verifyUser,
     verifyAdmin,
     ({ params: { partnerId } }, res, next) => {

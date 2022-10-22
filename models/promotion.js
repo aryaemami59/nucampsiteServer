@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const { Schema, model, Types } = mongoose;
 require("mongoose-currency").loadType(mongoose);
-const { Currency } = mongoose.Types;
+const { Currency } = Types;
 
 const promotionSchema = new Schema(
   {
@@ -31,6 +31,6 @@ const promotionSchema = new Schema(
   }
 );
 
-const Promotion = mongoose.model("Promotion", promotionSchema);
+const Promotion = model("Promotion", promotionSchema);
 
 module.exports = Promotion;

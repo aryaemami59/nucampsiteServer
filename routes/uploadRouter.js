@@ -1,37 +1,37 @@
 const express = require("express");
 const { verifyAdmin, verifyUser } = require("../authenticate");
 const multer = require("multer");
-const cors = require("./cors");
+const { cors, corsWithOptions } = require("./cors");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/images");
   },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
+  filename: (req, { originalname }, cb) => {
+    cb(null, originalname);
   },
 });
 
-const imageFileFilter = (req, file, cb) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+const fileFilter = (req, { originalname }, cb) => {
+  if (!originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
     return cb(new Error("You can upload only image files!"), false);
   }
   cb(null, true);
 };
 
-const upload = multer({ storage: storage, fileFilter: imageFileFilter });
+const upload = multer({ storage, fileFilter });
 
 const uploadRouter = express.Router();
 
 uploadRouter
   .route("/")
-  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .get(cors.cors, verifyUser, verifyAdmin, (req, res) => {
+  .options(corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end("GET operation not supported on /imageUpload");
   })
   .post(
-    cors.corsWithOptions,
+    corsWithOptions,
     verifyUser,
     verifyAdmin,
     upload.single("imageFile"),
@@ -41,11 +41,11 @@ uploadRouter
       res.json(req.file);
     }
   )
-  .put(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
+  .put(corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /imageUpload");
   })
-  .delete(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
+  .delete(corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end("DELETE operation not supported on /imageUpload");
   });
