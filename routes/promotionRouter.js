@@ -33,7 +33,7 @@ promotionRouter
         .catch(err => next(err));
     }
   )
-  .put(cors.corsWithOptions, verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /${routerName}s`);
   })
@@ -62,6 +62,7 @@ promotionRouter
   .post(
     cors.corsWithOptions,
     verifyUser,
+    verifyAdmin,
     ({ params: { promotionId } }, res) => {
       res.statusCode = 403;
       res.end(`POST operation not supported on /${routerName}s/${promotionId}`);

@@ -33,7 +33,7 @@ partnerRouter
         .catch(err => next(err));
     }
   )
-  .put(cors.corsWithOptions, verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, verifyUser, verifyAdmin, (req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /${routerName}s`);
   })
@@ -59,10 +59,15 @@ partnerRouter
       })
       .catch(err => next(err));
   })
-  .post(cors.corsWithOptions, verifyUser, ({ params: { partnerId } }, res) => {
-    res.statusCode = 403;
-    res.end(`POST operation not supported on /${routerName}s/${partnerId}`);
-  })
+  .post(
+    cors.corsWithOptions,
+    verifyUser,
+    verifyAdmin,
+    ({ params: { partnerId } }, res) => {
+      res.statusCode = 403;
+      res.end(`POST operation not supported on /${routerName}s/${partnerId}`);
+    }
+  )
   .put(
     cors.corsWithOptions,
     verifyUser,

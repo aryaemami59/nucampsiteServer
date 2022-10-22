@@ -105,7 +105,7 @@ campsiteRouter
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
           res.json(campsite.comments);
-          return;
+          // return;
         }
         err = new Error(`Campsite ${campsiteId} not found`);
         err.status = 404;
@@ -140,12 +140,17 @@ campsiteRouter
         .catch(err => next(err));
     }
   )
-  .put(cors.corsWithOptions, verifyUser, ({ params: { campsiteId } }, res) => {
-    res.statusCode = 403;
-    res.end(
-      `PUT operation not supported on /${routerName}s/${campsiteId}/comments`
-    );
-  })
+  .put(
+    cors.corsWithOptions,
+    verifyUser,
+    verifyAdmin,
+    ({ params: { campsiteId } }, res) => {
+      res.statusCode = 403;
+      res.end(
+        `PUT operation not supported on /${routerName}s/${campsiteId}/comments`
+      );
+    }
+  )
   .delete(
     cors.corsWithOptions,
     verifyUser,
@@ -200,6 +205,7 @@ campsiteRouter
   .post(
     cors.corsWithOptions,
     verifyUser,
+    verifyAdmin,
     ({ params: { campsiteId, commentId } }, res) => {
       res.statusCode = 403;
       res.end(
