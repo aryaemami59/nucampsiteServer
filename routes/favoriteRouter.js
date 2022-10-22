@@ -91,7 +91,7 @@ favoriteRouter
             Favorite.findOne({ user })
               .then(favorite => {
                 if (favorite) {
-                  if (favorite?.campsites.includes(campsiteId)) {
+                  if (favorite.campsites.includes(campsiteId)) {
                     res.setHeader("Content-Type", "text/plain");
                     res.end(`That campsite is already a ${routerName}!`);
                     return;
